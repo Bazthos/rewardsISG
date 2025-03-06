@@ -179,6 +179,14 @@
                 box-sizing: border-box;
             }
 
+            input {
+        text-align: center; /* Centre la valeur entrée */
+    }
+
+    input::placeholder {
+        text-align: center; /* Centre le placeholder */
+    }
+
             .taxpool, .rewards {
                 box-sizing: border-box;
                 width: 100%;
@@ -245,8 +253,17 @@
 
         isgHold.addEventListener("input", () => calculateRewards());
 
+        // Permet de quitter l'input quand on appuie sur "Entrée"
+        isgHold.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault(); // Empêche le saut de ligne
+                this.blur(); // Quitte l'input
+            }
+        });
+
+
         function updateVolume(value) {
-            volumeDisplay.innerText = `${value} USD`;
+            volumeDisplay.innerText = formatNumber(value) + " USD";
             volumeInput.value = value;
             volumeSlider.value = value;
             updateCursorPosition(value);
@@ -269,10 +286,20 @@
             updateVolume(value);
         });
 
+        function formatNumber(value) {
+            if (value >= 1000000) {
+                return (value / 1000000).toFixed(2).toLocaleString("fr-FR") + " M";
+            } else if (value >= 1000) {
+                return value.toLocaleString("fr-FR");
+            } else {
+                return value.toFixed(2).replace(".", ","); // Afficher avec virgule si inférieur à 1000
+            }
+        }
+
         function calculateRewards() {
             let volume = parseFloat(volumeSlider.value) || 0;
-            let isgHoldings = parseFloat(document.getElementById("isgHoldings").value) || 0;
-            let totalISGSupply = 1000000000;
+            let isgHoldings = parseFloat(isgHold.value) || 0;
+            let totalISGSupply = 1000000000; 
 
             let poolTax = volume * 0.05;
             let rewardPool = poolTax * 0.95;
@@ -283,13 +310,18 @@
             let monthlyReward = dailyReward * 30;
             let monthlySui = monthlyReward / 2.80;
 
-            document.getElementById("poolTax").innerText = poolTax.toFixed(2);
-            document.getElementById("rewardPool").innerText = rewardPool.toFixed(2);
-            document.getElementById("dailyReward").innerText = dailyReward.toFixed(2);
-            document.getElementById("dailySui").innerText = dailySui.toFixed(2);
-            document.getElementById("monthlyReward").innerText = monthlyReward.toFixed(2);
-            document.getElementById("monthlySui").innerText = monthlySui.toFixed(2);
+            document.getElementById("poolTax").innerText = formatNumber(poolTax) + " USD";
+            document.getElementById("rewardPool").innerText = formatNumber(rewardPool) + " USD";
+            document.getElementById("dailyReward").innerText = formatNumber(dailyReward) + " USD";
+            document.getElementById("dailySui").innerText = formatNumber(dailySui) + " SUI";
+            document.getElementById("monthlyReward").innerText = formatNumber(monthlyReward) + " USD";
+            document.getElementById("monthlySui").innerText = formatNumber(monthlySui) + " SUI";
+
+            // Mise à jour de la barre de remplissage
+            let fillPercentage = (rewardPool / poolTax) * 100;
+            distributedFill.style.width = `${fillPercentage}%`;
         }
+
     </script>
 </body>
 </html>
