@@ -310,12 +310,12 @@
             let monthlyReward = dailyReward * 30;
             let monthlySui = monthlyReward / 2.80;
 
-            document.getElementById("poolTax").innerText = formatNumber(poolTax) + " USD";
-            document.getElementById("rewardPool").innerText = formatNumber(rewardPool) + " USD";
-            document.getElementById("dailyReward").innerText = formatNumber(dailyReward) + " USD";
-            document.getElementById("dailySui").innerText = formatNumber(dailySui) + " SUI";
-            document.getElementById("monthlyReward").innerText = formatNumber(monthlyReward) + " USD";
-            document.getElementById("monthlySui").innerText = formatNumber(monthlySui) + " SUI";
+            document.getElementById("poolTax").innerText = formatNumber(poolTax);
+            document.getElementById("rewardPool").innerText = formatNumber(rewardPool);
+            document.getElementById("dailyReward").innerText = formatNumber(dailyReward);
+            document.getElementById("dailySui").innerText = formatNumber(dailySui) ;
+            document.getElementById("monthlyReward").innerText = formatNumber(monthlyReward);
+            document.getElementById("monthlySui").innerText = formatNumber(monthlySui);
 
             // Mise à jour de la barre de remplissage
             let fillPercentage = (rewardPool / poolTax) * 100;
