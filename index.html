@@ -16,6 +16,7 @@
             color: white;
             text-align: center;
             padding: 20px;
+            user-select: none;
         }
 
         * {
@@ -262,8 +263,8 @@
 
         volumeSlider.addEventListener("input", (e) => updateVolume(e.target.value));
         volumeInput.addEventListener("input", (e) => {
-            let value = parseFloat(e.target.value) || 100;
-            if (value < 100) value = 100;
+            let value = parseFloat(e.target.value) || 0;
+            if (value < 0) value = 0;
             if (value > 10000000) value = 10000000;
             updateVolume(value);
         });
