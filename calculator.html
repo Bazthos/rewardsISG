@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <title>$ISG Rewards Calculator</title>
+    <style>
+        body {
+            font-family: "VT323", monospace;
+            font-size: 16px;
+            box-sizing: border-box;
+            background-color: #0E121E;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        * {
+            font-family: "VT323", monospace;
+            font-size: 16px;
+        }
+
+        .calculator {
+            display: flex;
+            flex-direction: column;
+            max-width: 500px;
+            margin: auto;
+            padding: 20px;
+            background: #1A1F2E;
+            border-radius: 10px;
+        }
+
+        input {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+        }
+
+        input::placeholder {
+            font-family: "VT323", monospace;
+        }
+
+        .volume-slider-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            position: relative;
+            margin: 20px 0;
+        }
+
+        .slider-track {
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            height: 10px;
+            background: #2E374F;
+            border-radius: 5px;
+         
+        }
+
+        .progress-bar {
+            position: absolute;
+            border-radius: 50px;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0%;
+            background: #00A3FF;
+            transition: width 0.2s ease-in-out;
+        }
+
+        #volumeSlider {
+            width: 100%;
+            max-width: 100%;
+            position: absolute;
+            top: -22px;
+            left: 0;
+            appearance: none;
+            background: transparent;
+            z-index: 2;
+            opacity: 0;
+        }
+
+        .cursor {
+            position: absolute;
+            top: -6px;
+            width: 20px;
+            height: 20px;
+            background: #00A3FF;
+            border-radius: 50%;
+            transition: left 0.2s ease-in-out;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        #volumeDisplay {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        .result-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 20px;
+            background: #161B2A;
+            padding: 20px;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .taxpool {
+            background: #00A3FF;
+            padding: 20px;
+            border-radius: 10px;
+            width: 50%;
+            text-align: left;
+        }
+
+        .taxpool h3 {
+            font-size: 18px;
+            margin: 0;
+        }
+
+        .taxpool .value {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .arrow {
+            position: absolute;
+            top: 50%;
+            left: 55%;
+            transform: translate(-50%, -50%);
+            font-size: 30px;
+            color: white;
+            animation: bounce 1s infinite alternate;
+        }
+
+        @keyframes bounce {
+            0% { transform: translate(-50%, -50%) translateY(0); }
+            100% { transform: translate(-50%, -50%) translateY(-10px); }
+        }
+
+        .rewards {
+            text-align: right;
+            width: 50%;
+        }
+
+        .rewards p {
+            font-size: 18px;
+            margin: 5px 0;
+        }
+
+        .highlight {
+            font-size: 20px;
+            font-weight: bold;
+            color: #00A3FF;
+        }
+
+         /* Responsive Mobile */
+         @media screen and (max-width: 600px) {
+            .result-container {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                box-sizing: border-box;
+            }
+
+            .taxpool, .rewards {
+                box-sizing: border-box;
+                width: 100%;
+                text-align: center;
+            }
+
+            .arrow {
+                position: static;
+                rotate: 90deg;
+                margin: 10px 0;
+                animation: none; 
+                transform: translate(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <h2>$ISG Rewards Calculator</h2>
+
+        <label>24h Trading Volume (USD)</label>
+        <div class="volume-slider-container">
+            <div class="slider-track">
+                <div class="progress-bar"></div>
+                <div id="volumeCursor" class="cursor"></div>
+                <input type="range" id="volumeSlider" min="0" max="10000000" step="100" value="100">
+            </div>
+            <span id="volumeDisplay">0 USD</span>
+            <input type="number" id="volumeInput" style="display: none;" min="100" max="10000000" step="100" value="100">
+        </div>
+
+        <label>Your $ISG Holdings</label>
+        <input type="number" id="isgHoldings" placeholder="Enter your $ISG amount">
+
+        <div class="result-container">
+            <!-- Bloc TAXPOOL avec barre de remplissage -->
+            <div class="taxpool">
+                <div class="progress-fill" id="progressFill"></div>
+                <h3>Generated Tax Pool</h3>
+                <p class="pool-value"><span id="poolTax">0</span> USD</p>
+                <h3>Distributed Rewards</h3>
+                <p class="pool-value"><span id="rewardPool">0</span> USD</p>
+            </div>
+
+            <div class="arrow">➡️</div>
+
+            <!-- Bloc des récompenses -->
+            <div class="rewards">
+                <p>Your Daily Earnings:</p>
+                <p class="highlight"><span id="dailyReward">0</span> USD (<span id="dailySui">0</span> SUI)</p>
+                <p>Monthly Projection:</p>
+                <p class="highlight"><span id="monthlyReward">0</span> USD (<span id="monthlySui">0</span> SUI)</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const volumeSlider = document.getElementById("volumeSlider");
+        const volumeInput = document.getElementById("volumeInput");
+        const volumeDisplay = document.getElementById("volumeDisplay");
+        const volumeCursor = document.getElementById("volumeCursor");
+        const progressBar = document.querySelector(".progress-bar");
+        const isgHold = document.getElementById("isgHoldings");
+
+        isgHold.addEventListener("input", () => calculateRewards());
+
+        function updateVolume(value) {
+            volumeDisplay.innerText = `${value} USD`;
+            volumeInput.value = value;
+            volumeSlider.value = value;
+            updateCursorPosition(value);
+            calculateRewards();
+        }
+
+        function updateCursorPosition(value) {
+            const min = parseInt(volumeSlider.min);
+            const max = parseInt(volumeSlider.max);
+            const percent = ((value - min) / (max - min)) * 100;
+            volumeCursor.style.left = `calc(${percent}% - 10px)`;
+            progressBar.style.width = `${percent}%`;
+        }
+
+        volumeSlider.addEventListener("input", (e) => updateVolume(e.target.value));
+        volumeInput.addEventListener("input", (e) => {
+            let value = parseFloat(e.target.value) || 100;
+            if (value < 100) value = 100;
+            if (value > 10000000) value = 10000000;
+            updateVolume(value);
+        });
+
+        function calculateRewards() {
+            let volume = parseFloat(volumeSlider.value) || 0;
+            let isgHoldings = parseFloat(document.getElementById("isgHoldings").value) || 0;
+            let totalISGSupply = 1000000000;
+
+            let poolTax = volume * 0.05;
+            let rewardPool = poolTax * 0.95;
+
+            let userShare = isgHoldings / totalISGSupply;
+            let dailyReward = rewardPool * userShare;
+            let dailySui = dailyReward / 2.80;
+            let monthlyReward = dailyReward * 30;
+            let monthlySui = monthlyReward / 2.80;
+
+            document.getElementById("poolTax").innerText = poolTax.toFixed(2);
+            document.getElementById("rewardPool").innerText = rewardPool.toFixed(2);
+            document.getElementById("dailyReward").innerText = dailyReward.toFixed(2);
+            document.getElementById("dailySui").innerText = dailySui.toFixed(2);
+            document.getElementById("monthlyReward").innerText = monthlyReward.toFixed(2);
+            document.getElementById("monthlySui").innerText = monthlySui.toFixed(2);
+        }
+    </script>
+</body>
+</html>
