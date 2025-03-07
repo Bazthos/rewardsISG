@@ -1,196 +1,186 @@
-<script>
-    class ISGRewardsCalculator extends HTMLElement {
-    constructor() {
-        super();
-
-        // Création du Shadow DOM
-        this.attachShadow({ mode: "open" });
-
-        // Structure HTML
-        this.shadowRoot.innerHTML = `
-            <style>
-                :host {
-                    font-family: "VT323", monospace;
-                    font-size: 16px;
-                    box-sizing: border-box;
-                    background-color: transparent;
-                    color: white;
-                    text-align: center;
-                    display: block;
-                    user-select: none;
-                }
-
-                .calculator {
-                    display: flex;
-                    flex-direction: column;
-                    margin: auto;
-                    padding: 20px;
-                    background: #1A1F2E;
-                    border-radius: 10px;
-                }
-
-                input {
-                    box-sizing: border-box;
-                    width: 100%;
-                    padding: 10px;
-                    margin: 10px 0;
-                    border: none;
-                    border-radius: 5px;
-                    text-align: center;
-                }
-
-                .result-container {
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    margin-top: 20px;
-                    background: #161B2A;
-                    padding: 20px;
-                    border-radius: 10px;
-                    position: relative;
-                }
-
-                .taxpool {
-                    background: #00A3FF;
-                    padding: 20px;
-                    border-radius: 10px;
-                    width: 50%;
-                    text-align: center;
-                    position: relative;
-                    overflow: hidden;
-                }
-
-                        .taxpool h3 {
-            font-size: 18px;
+<html>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, in   itial-scale=1.0'>
+    <title>$ISG Rewards Calculator</title>
+    <style>
+        html, body {
             margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 450px; /* Hauteur minimum pour éviter le problème */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: transparent;
+            color: white;
+            font-family: 'VT323', monospace;
+            user-select: none;
+            overflow: hidden;
         }
 
-        .taxpool .value {
-            font-size: 22px;
-            font-weight: bold;
+        .calculator {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        
+            padding: 20px;
+            background: #1A1F2E;
+            border-radius: 10px;
+            height: auto; /* S'ajuste automatiquement */
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            
+        }
+
+        #volumeDisplay{
+            margin-bottom: 20px;
+        }
+
+        .result-container {
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 20px;
+            background: #161B2A;
+            padding: 20px;
+            border-radius: 10px;
+            position: relative;
+            width: 100%;
+        }
+
+        .taxpool {
+            background: #2E374F;
+            padding: 20px;
+            border-radius: 10px;
+            width: 50%;
+            text-align: center;
         }
 
         .arrow {
-            position: absolute;
-            top: 50%;
-            left: 55%;
-            transform: translate(-50%, -50%);
             font-size: 30px;
             color: white;
-            animation: bounce 1s infinite alternate;
+            margin: 10px;
         }
 
-        @keyframes bounce {
-            0% { transform: translate(-50%, -50%) translateY(0); }
-            100% { transform: translate(-50%, -50%) translateY(-10px); }
+        .rewards {
+            text-align: center;
+            width: 50%;
         }
-    
-                .rewards {
-                    text-align: center;
-                    width: 50%;
-                }
 
-                .highlight {
-                    font-size: 20px;
-                    font-weight: bold;
-                    color: #white;
-                }
+        .highlight {
+            font-size: 20px;
+            font-weight: bold;
+            color: #00A3FF;
+        }
 
-                /* Responsive Mobile */
-                @media screen and (max-width: 600px) {
-                    .result-container {
-                        flex-direction: column;
-                    }
+        /* Responsive Mobile */
+        @media screen and (max-width: 600px) {
+            .result-container {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
 
-                    .taxpool, .rewards {
-                        width: 100%;
-                    }
+            .taxpool, .rewards {
+                width: 100%;
+            }
 
-                    .arrow {
-                        transform: rotate(90deg);
-                        margin: 10px 0;
-                    }
-                }
-            </style>
+            .arrow {
+                transform: rotate(90deg);
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class='calculator'>
+        <h2>$ISG Rewards Calculator</h2>
 
-            <div class="calculator">
-                <h2>$ISG Rewards Calculator</h2>
+        <label>24h Trading Volume (USD)</label>
+        <input type='range' id='volumeSlider' min='100' max='10000000' step='100' value='100'>
+        <span id='volumeDisplay'>100 USD</span>
 
-                <label>24h Trading Volume (USD)</label>
-                <input type="range" id="volumeSlider" min="100" max="10000000" step="100" value="100">
-                <span id="volumeDisplay">100 USD</span>
+        <label>Your $ISG Holdings</label>
+        <input type='number' id='isgHoldings' placeholder='Enter your $ISG amount'>
 
-                <label>Your $ISG Holdings</label>
-                <input type="number" id="isgHoldings" placeholder="Enter your $ISG amount">
-
-                <div class="result-container">
-                    <div class="taxpool">
-                        
-                        <h3>Generated Tax Pool</h3>
-                        <p class="pool-value"><span id="poolTax">0</span> USD</p>
-                        <h3>Distributed Rewards</h3>
-                        <p class="pool-value"><span id="rewardPool">0</span> USD</p>
-                    </div>
-
-                    <div class="arrow">➡️</div>
-
-                    <div class="rewards">
-                        <p>Your Daily Earnings:</p>
-                        <p class="highlight"><span id="dailyReward">0</span> USD (<span id="dailySui">0</span> SUI)</p>
-                        <p>Monthly Projection:</p>
-                        <p class="highlight"><span id="monthlyReward">0</span> USD (<span id="monthlySui">0</span> SUI)</p>
-                    </div>
-                </div>
+        <div class='result-container'>
+            <div class='taxpool'>
+                <h3>Generated Tax Pool</h3>
+                <p class='pool-value'><span id='poolTax'>0</span> USD</p>
+                <h3>Distributed Rewards</h3>
+                <p class='pool-value'><span id='rewardPool'>0</span> USD</p>
             </div>
-        `;
 
-        this.volumeSlider = this.shadowRoot.getElementById("volumeSlider");
-        this.volumeDisplay = this.shadowRoot.getElementById("volumeDisplay");
-        this.isgHold = this.shadowRoot.getElementById("isgHoldings");
-        this.distributedFill = this.shadowRoot.getElementById("distributedFill");
+            <div class='arrow'>➡️</div>
 
-        this.volumeSlider.addEventListener("input", () => this.updateVolume());
-        this.isgHold.addEventListener("input", () => this.calculateRewards());
+            <div class='rewards'>
+                <p>Your Daily Earnings:</p>
+                <p class='highlight'><span id='dailyReward'>0</span> USD (<span id='dailySui'>0</span> SUI)</p>
+                <p>Monthly Projection:</p>
+                <p class='highlight'><span id='monthlyReward'>0</span> USD (<span id='monthlySui'>0</span> SUI)</p>
+            </div>
+        </div>
+    </div>
 
-        this.isgHold.addEventListener("keypress", (event) => {
-            if (event.key === "Enter") {
+    <script>
+        const volumeSlider = document.getElementById('volumeSlider');
+        const volumeDisplay = document.getElementById('volumeDisplay');
+        const isgHold = document.getElementById('isgHoldings');
+
+        volumeSlider.addEventListener('input', updateVolume);
+        isgHold.addEventListener('input', calculateRewards);
+
+        isgHold.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
                 event.preventDefault();
-                this.isgHold.blur();
+                isgHold.blur();
             }
         });
-    }
 
-    updateVolume() {
-        this.volumeDisplay.innerText = `${this.volumeSlider.value} USD`;
-        this.calculateRewards();
-    }
+        function updateVolume() {
+            volumeDisplay.innerText = `${volumeSlider.value} USD`;
+            calculateRewards();
+        }
 
-    calculateRewards() {
-        let volume = parseFloat(this.volumeSlider.value) || 0;
-        let isgHoldings = parseFloat(this.isgHold.value) || 0;
-        let totalISGSupply = 1000000000;
+        function calculateRewards() {
+            let volume = parseFloat(volumeSlider.value) || 0;
+            let isgHoldings = parseFloat(isgHold.value) || 0;
+            let totalISGSupply = 1000000000;
 
-        let poolTax = volume * 0.05;
-        let rewardPool = poolTax * 0.95;
+            let poolTax = volume * 0.05;
+            let rewardPool = poolTax * 0.95;
 
-        let userShare = isgHoldings / totalISGSupply;
-        let dailyReward = rewardPool * userShare;
-        let dailySui = dailyReward / 2.80;
-        let monthlyReward = dailyReward * 30;
-        let monthlySui = monthlyReward / 2.80;
+            let userShare = isgHoldings / totalISGSupply;
+            let dailyReward = rewardPool * userShare;
+            let dailySui = dailyReward / 2.80;
+            let monthlyReward = dailyReward * 30;
+            let monthlySui = monthlyReward / 2.80;
 
-        this.shadowRoot.getElementById("poolTax").innerText = poolTax.toLocaleString("fr-FR");
-        this.shadowRoot.getElementById("rewardPool").innerText = rewardPool.toLocaleString("fr-FR");
-        this.shadowRoot.getElementById("dailyReward").innerText = dailyReward.toLocaleString("fr-FR");
-        this.shadowRoot.getElementById("dailySui").innerText = dailySui.toLocaleString("fr-FR");
-        this.shadowRoot.getElementById("monthlyReward").innerText = monthlyReward.toLocaleString("fr-FR");
-        this.shadowRoot.getElementById("monthlySui").innerText = monthlySui.toLocaleString("fr-FR");
-    }
-}
+            document.getElementById('poolTax').innerText = poolTax.toLocaleString('fr-FR');
+            document.getElementById('rewardPool').innerText = rewardPool.toLocaleString('fr-FR');
+            document.getElementById('dailyReward').innerText = dailyReward.toLocaleString('fr-FR');
+            document.getElementById('dailySui').innerText = dailySui.toLocaleString('fr-FR');
+            document.getElementById('monthlyReward').innerText = monthlyReward.toLocaleString('fr-FR');
+            document.getElementById('monthlySui').innerText = monthlySui.toLocaleString('fr-FR');
 
-// Déclare le Web Component
-customElements.define("isg-rewards-calculator", ISGRewardsCalculator);
+            updateIframeHeight();
+        }
 
-</script>
+        function updateIframeHeight() {
+            if (window.parent) {
+                window.parent.postMessage({ embedHeight: document.body.scrollHeight }, '*');
+            }
+        }
 
-<isg-rewards-calculator></isg-rewards-calculator>
+        new ResizeObserver(updateIframeHeight).observe(document.body);
+    </script>
+</body>
+</html>
