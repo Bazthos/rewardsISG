@@ -13,18 +13,16 @@
                     font-family: "VT323", monospace;
                     font-size: 16px;
                     box-sizing: border-box;
-                    background-color: #0E121E;
+                    background-color: transparent;
                     color: white;
                     text-align: center;
                     display: block;
-                    padding: 20px;
                     user-select: none;
                 }
 
                 .calculator {
                     display: flex;
                     flex-direction: column;
-                    max-width: 500px;
                     margin: auto;
                     padding: 20px;
                     background: #1A1F2E;
@@ -53,7 +51,7 @@
                 }
 
                 .taxpool {
-                    background: #2E374F;
+                    background: #00A3FF;
                     padding: 20px;
                     border-radius: 10px;
                     width: 50%;
@@ -62,34 +60,31 @@
                     overflow: hidden;
                 }
 
-                .generated-fill {
-                    position: absolute;
-                    bottom: 0;
-                    left: 0;
-                    height: 100%;
-                    width: 100%;
-                    background: rgba(255, 165, 0, 0.5);
-                    z-index: 1;
-                }
+                        .taxpool h3 {
+            font-size: 18px;
+            margin: 0;
+        }
 
-                .distributed-fill {
-                    position: absolute;
-                    bottom: 0;
-                    left: 0;
-                    height: 100%;
-                    width: 0%;
-                    background: #00A3FF;
-                    transition: width 0.5s ease-in-out;
-                    opacity: 0.8;
-                    z-index: 2;
-                }
+        .taxpool .value {
+            font-size: 22px;
+            font-weight: bold;
+        }
 
-                .arrow {
-                    font-size: 30px;
-                    color: white;
-                    margin: 10px;
-                }
+        .arrow {
+            position: absolute;
+            top: 50%;
+            left: 55%;
+            transform: translate(-50%, -50%);
+            font-size: 30px;
+            color: white;
+            animation: bounce 1s infinite alternate;
+        }
 
+        @keyframes bounce {
+            0% { transform: translate(-50%, -50%) translateY(0); }
+            100% { transform: translate(-50%, -50%) translateY(-10px); }
+        }
+    
                 .rewards {
                     text-align: center;
                     width: 50%;
@@ -98,7 +93,7 @@
                 .highlight {
                     font-size: 20px;
                     font-weight: bold;
-                    color: #00A3FF;
+                    color: #white;
                 }
 
                 /* Responsive Mobile */
@@ -130,8 +125,7 @@
 
                 <div class="result-container">
                     <div class="taxpool">
-                        <div class="generated-fill"></div>
-                        <div class="distributed-fill" id="distributedFill"></div>
+                        
                         <h3>Generated Tax Pool</h3>
                         <p class="pool-value"><span id="poolTax">0</span> USD</p>
                         <h3>Distributed Rewards</h3>
@@ -191,9 +185,6 @@
         this.shadowRoot.getElementById("dailySui").innerText = dailySui.toLocaleString("fr-FR");
         this.shadowRoot.getElementById("monthlyReward").innerText = monthlyReward.toLocaleString("fr-FR");
         this.shadowRoot.getElementById("monthlySui").innerText = monthlySui.toLocaleString("fr-FR");
-
-        let fillPercentage = (rewardPool / poolTax) * 100;
-        this.distributedFill.style.width = `${fillPercentage}%`;
     }
 }
 
