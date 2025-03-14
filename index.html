@@ -146,7 +146,7 @@
         });
 
         function updateVolume() {
-            volumeDisplay.innerText = `${volumeSlider.value} USD`;
+            volumeDisplay.innerText = `${parseInt(volumeSlider.value).toLocaleString('fr-FR')} USD`;
             calculateRewards();
         }
 
@@ -160,9 +160,9 @@
 
             let userShare = isgHoldings / totalISGSupply;
             let dailyReward = rewardPool * userShare;
-            let dailySui = dailyReward / 2.80;
+            let dailySui = dailyReward / 2.34;
             let monthlyReward = dailyReward * 30;
-            let monthlySui = monthlyReward / 2.80;
+            let monthlySui = monthlyReward / 2.34;
 
             document.getElementById('poolTax').innerText = poolTax.toLocaleString('fr-FR');
             document.getElementById('rewardPool').innerText = rewardPool.toLocaleString('fr-FR');
