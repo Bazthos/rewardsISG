@@ -155,8 +155,8 @@
             let isgHoldings = parseFloat(isgHold.value) || 0;
             let totalISGSupply = 1000000000;
 
-            let poolTax = volume * 0.05;
-            let rewardPool = poolTax * 0.95;
+            let poolTax = volume * 0.02;
+            let rewardPool = poolTax * 0.98;
 
             let userShare = isgHoldings / totalISGSupply;
             let dailyReward = rewardPool * userShare;
